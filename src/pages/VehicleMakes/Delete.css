@@ -1,0 +1,29 @@
+.back-to-list {
+  width: 100px;
+  font-size: 17px;
+  color: black;
+}
+
+.delete-make-body {
+  display: grid;
+  width: 140px;
+  grid-template-columns: 70px 200px;
+  align-content: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.delete-make-body .name,
+.abrv {
+  text-align: end;
+}
+
+.name-placeholder,
+.abrv-placeholder {
+  font-weight: bold;
+}
+
+.delete-make-body button {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}

@@ -1,0 +1,16 @@
+form {
+  width: auto;
+  display: inline-grid;
+  grid-template-columns: 70px 200px;
+  margin-bottom: 20px;
+  row-gap: 20px;
+}
+
+form button {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
+form .error {
+  border: 2px solid red;
+}

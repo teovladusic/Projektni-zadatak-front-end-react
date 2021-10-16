@@ -1,109 +1,116 @@
-import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import "./Index.css";
 
 const url = "https://localhost:44327/VehicleMakes";
 
 export default function Index() {
-  const [pagedVehicleMakes, setPagedVehicleMakes] = useState({
-    vehicleMakes: [],
-    currentPage: 1,
-    hasNext: false,
-    hasPrevious: false,
-    pageSize: 10,
-    totalCount: 0,
-    totalPages: 0,
-  });
+  const [pagedVehicleMakes, setPagedVehicleMakes] = useState({});
 
-  const query = new URLSearchParams(useLocation().search);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [params, setParams] = useState({
     searchQuery: "",
     pageSize: 10,
-    pageNumber: query.get("pageNumber") && 1,
+    pageNumber: 1,
+    orderBy: "Order By",
   });
 
   useEffect(() => {
     getVehicleMakes();
-    params.searchQuery = query.get("searchQuery");
-    params.pageSize = query.get("pageSize");
-    const orderBy = query.get("orderBy");
-    document.getElementById("orderByControl").value = orderBy
-      ? orderBy
-      : "Order By";
   }, []);
 
   const getVehicleMakes = async () => {
-    const searchQuery = query.get("searchQuery") || "";
-    const pageNumber = query.get("pageNumber") || 1;
-    const pageSize = query.get("pageSize") || 10;
-    const orderBy = query.get("orderBy") || "Order By";
-
+    setIsLoading(true);
     const queryStringParams = `?SearchQuery=${encodeURIComponent(
-      searchQuery
+      params.searchQuery
     )}&PageNumber=${encodeURIComponent(
-      pageNumber
-    )}&PageSize=${encodeURIComponent(pageSize)}&OrderBy=${encodeURIComponent(
-      orderBy
-    )}`;
+      params.pageNumber
+    )}&PageSize=${encodeURIComponent(
+      params.pageSize
+    )}&OrderBy=${encodeURIComponent(params.orderBy)}`;
+
     const response = await fetch(`${url}${queryStringParams}`);
 
     const jsonResponse = await response.json();
-
+    console.log(jsonResponse);
     setPagedVehicleMakes(jsonResponse);
+    setParams({ ...params, pageSize: jsonResponse.pageSize });
+    setIsLoading(false);
   };
 
   const handleChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
     setParams({ ...params, [name]: value });
+    console.log(e.target.value);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    getVehicleMakes();
+    console.log("submit");
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container">
+        <h2>Loading</h2>
+      </div>
+    );
+  }
   return (
     <div className="container">
       <h1>VehicleMakes</h1>
-      <Link to="/vehiclemakes/create">Create</Link>
+      <Link className="create-link" to="/vehiclemakes/create">
+        Create New Make
+      </Link>
+      <hr />
 
-      <form method="get">
-        <div className="form-outline">
-          <p>
-            Search:{" "}
-            <input
-              type="text"
-              name="searchQuery"
-              value={params.searchQuery}
-              onChange={handleChange}
-            />
-          </p>
-        </div>
-        <div className="form-group">
-          <label for="orderByControl">Order by</label>
-          <select className="form-control" id="orderByControl" name="orderBy">
-            <option>Order By</option>
-            <option>name desc</option>
-            <option>name asc</option>
-            <option>abrv desc</option>
-            <option>abrv asc</option>
-          </select>
-        </div>
-        <p>
-          Items per page:{" "}
+      <form className="makes-query-form" onSubmit={(e) => handleSubmit(e)}>
+        <input
+          value={params.searchQuery}
+          className="search"
+          type="text"
+          name="searchQuery"
+          placeholder="Search.."
+          onChange={(e) => handleChange(e)}
+        />
+
+        <select
+          className="order-by-select"
+          value={params.orderBy}
+          onChange={(e) => handleChange(e)}
+          id="orderByControl"
+          name="orderBy"
+        >
+          <option>Order By</option>
+          <option>name desc</option>
+          <option>name asc</option>
+          <option>abrv desc</option>
+          <option>abrv asc</option>
+        </select>
+
+        <div className="items-per-page">
+          <label htmlFor="pageSize">Page Size</label>
           <input
             type="number"
             name="pageSize"
             value={params.pageSize}
-            onChange={handleChange}
+            onChange={(e) => handleChange(e)}
           />
-        </p>
-        <button type="submit" value="Search" className="btn btn-primary">
+        </div>
+
+        <button type="submit" className="btn btn-primary btn-find-makes">
           Submit
         </button>
+      </form>
+
+      <div className="next-previous">
         <button
           className={`btn btn-default ${
             pagedVehicleMakes.hasPrevious ? "" : "disabled"
           }`}
-          name="pageNumber"
-          value={pagedVehicleMakes.currentPage - 1}
         >
           Previous
         </button>
@@ -111,13 +118,11 @@ export default function Index() {
           className={`btn btn-default ${
             pagedVehicleMakes.hasNext ? "" : "disabled"
           }`}
-          name="pageNumber"
-          //ovo ti sad stvara string ti i onda kad ti je prva stranica i stisnes next bude ti 11
-          value={pagedVehicleMakes.currentPage + 1}
         >
           Next
         </button>
-      </form>
+      </div>
+
       <table className="table">
         <thead>
           <tr>
@@ -133,13 +138,15 @@ export default function Index() {
                 <td>{vehicleMake.name}</td>
                 <td>{vehicleMake.abrv}</td>
                 {
-                  <td>
+                  <td className="vehiclemakes-links">
                     <Link to={`/vehiclemakes/edit/${vehicleMake.id}`}>
                       Edit
                     </Link>
+
                     <Link to={`/vehiclemakes/details/${vehicleMake.id}`}>
                       Details
                     </Link>
+
                     <Link to={`/vehiclemakes/delete/${vehicleMake.id}`}>
                       Delete
                     </Link>

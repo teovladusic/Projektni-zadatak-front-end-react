@@ -1,0 +1,51 @@
+.create-link {
+  color: black;
+  font-size: 19px;
+}
+
+.makes-query-form {
+  display: block;
+}
+
+.search {
+  display: block;
+  width: 30vw;
+  padding: 5px 10px;
+}
+
+.order-by-select {
+  display: block;
+  margin-top: 20px;
+  width: 15vw;
+  padding: 5px 10px;
+}
+
+.items-per-page {
+  margin-top: 20px;
+}
+
+.items-per-page label,
+input {
+  display: block;
+}
+
+.btn-find-makes {
+  display: block;
+  width: 15vw;
+  margin-top: 20px;
+}
+
+.next-previous {
+  display: flex;
+  width: 15vw;
+  margin-top: 20px;
+}
+
+.vehiclemakes-links a {
+  margin: 0px 6px;
+  color: black;
+}
+
+.vehiclemakes-links :hover {
+  color: blue;
+}

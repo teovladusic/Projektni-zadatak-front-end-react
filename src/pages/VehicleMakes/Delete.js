@@ -1,68 +1,62 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useHistory } from "react-router-dom";
+import "./Delete.css";
+import {
+  DeleteVehicleMake,
+  GetVehicleMake,
+} from "../../common/VehicleMakesService";
 
 const url = "https://localhost:44327/VehicleMakes/details";
-const deleteUrl = "https://localhost:44327/VehicleMakes/delete";
 
 const Delete = () => {
-  const [vehicleMake, setVehicleMake] = useState({
-    id: 0,
-    name: "",
-    abrv: "",
-  });
-  const { id } = useParams();
+  const history = useHistory();
 
-  const handleSubmit = (e) => {
+  const { id } = useParams();
+  const [vehicleMake, setVehicleMake] = useState();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (vehicleMake.name && vehicleMake.abrv) {
-      const requestOptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      };
-      fetch(`${deleteUrl}/${vehicleMake.id}`, requestOptions).then(
-        (response) => response
-      );
-    }
+    await DeleteVehicleMake(vehicleMake.id);
+    history.push("/vehicleMakes");
   };
 
   const getVehicleMake = async () => {
-    const response = await fetch(`${url}/${id}`);
-    const vehicleMake = await response.json();
-    console.log(vehicleMake);
+    setIsLoading(true);
+    let vehicleMake = await GetVehicleMake(id);
     setVehicleMake(vehicleMake);
+    setIsLoading(false);
   };
+
   useEffect(() => {
     getVehicleMake();
   }, []);
+
+  if (isLoading) {
+    return <h2>Loading..</h2>;
+  }
+
   return (
     <div className="container">
       <h1>Delete</h1>
-      <hr />
       <h3>Are you sure you want to delete this?</h3>
-      <div>
-        <hr />
-        <dl class="row">
-          <dt class="col-sm-2">Name</dt>
-          <dd class="col-sm-10">{vehicleMake.name}</dd>
-          <dt class="col-sm-2">Abrv</dt>
-          <dd class="col-sm-10">{vehicleMake.abrv}</dd>
-        </dl>
+      <hr />
 
-        <form asp-action="Delete">
-          <button
-            type="submit"
-            className="btn btn-danger"
-            onClick={handleSubmit}
-          >
-            Delete
-          </button>
-          <Link to="/vehiclemakes">Back to list</Link>
-        </form>
+      <div className="delete-make-body">
+        <p className="name-placeholder">Name:</p>
+        <p className="name">{vehicleMake.name}</p>
+        <p className="abrv-placeholder">Abrv:</p>
+        <p className="abrv">{vehicleMake.abrv}</p>
+
+        <button className="btn btn-danger" onClick={handleSubmit}>
+          Delete
+        </button>
       </div>
+
+      <Link className="back-to-list" to="/vehiclemakes">
+        Back to list
+      </Link>
     </div>
   );
 };

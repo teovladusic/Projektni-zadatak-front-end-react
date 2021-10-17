@@ -1,148 +1,174 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import "./Index.css";
+import { OrderByOptions } from "../../common/Utils";
+import { GetVehicleModels } from "../../common/VehicleModelsService";
+import { GetVehicleMakes } from "../../common/VehicleMakesService";
 
-const url = "https://localhost:44327/Vehiclemodels";
-const vehicleMakesUrl = "https://localhost:44327/Vehiclemakes";
-
-export default function Index() {
-  const [pagedVehicleModels, setPagedVehicleModels] = useState({
-    vehicleModels: [],
-    currentPage: 1,
-    hasNext: false,
-    hasPrevious: false,
-    pageSize: 10,
-    totalCount: 0,
-    totalPages: 0,
-  });
-
+const Index = () => {
+  const [vehicleModels, setVehicleModels] = useState({});
   const [vehicleMakes, setVehicleMakes] = useState([]);
 
-  const query = new URLSearchParams(useLocation().search);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [params, setParams] = useState({
     searchQuery: "",
     pageSize: 10,
-    pageNumber: query.get("pageNumber") && 1,
+    pageNumber: 1,
+    orderBy: "Order By",
+    makeName: "Select Make",
   });
 
+  const loadVehicleModels = async () => {
+    setIsLoading(true);
+    let newParams = params;
+    if (params.makeName === "Select Make") {
+      newParams.makeName = "";
+    }
+    let models = await GetVehicleModels(newParams);
+    setVehicleModels(models);
+    setParams({ ...params, pageSize: models.pageSize });
+    let makeParams = {
+      searchQuery: "",
+      pageNumber: 1,
+      pageSize: 50,
+      orderBy: "Order By",
+    };
+    let makes = await GetVehicleMakes(makeParams);
+    setVehicleMakes(makes.vehicleMakes);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    getVehicleModels();
-    getAllVehicleMakes();
-    params.searchQuery = query.get("searchQuery");
-    params.pageSize = query.get("pageSize");
-
-    const orderBy = query.get("orderBy");
-    document.getElementById("orderByControl").value = orderBy
-      ? orderBy
-      : "Order By";
+    loadVehicleModels();
   }, []);
-
-  const getAllVehicleMakes = async () => {
-    const response = await fetch(vehicleMakesUrl);
-    const jsonResponse = await response.json();
-    console.log("jsonResponse " + jsonResponse);
-    setVehicleMakes(jsonResponse.vehicleMakes);
-    const makeName = query.get("makeName");
-    document.getElementById("makeNameControl").value = makeName
-      ? makeName
-      : "Make Name";
-  };
-
-  const getVehicleModels = async () => {
-    const searchQuery = query.get("searchQuery") || "";
-    const pageNumber = query.get("pageNumber") || 1;
-    const pageSize = query.get("pageSize") || 10;
-    const orderBy = query.get("orderBy") || "Order By";
-    const makeName = query.get("makeName") || "Make Name";
-
-    const queryStringParams = `?SearchQuery=${encodeURIComponent(
-      searchQuery
-    )}&PageNumber=${encodeURIComponent(
-      pageNumber
-    )}&PageSize=${encodeURIComponent(pageSize)}&OrderBy=${encodeURIComponent(
-      orderBy
-    )}&MakeName=${encodeURIComponent(makeName)}`;
-    const response = await fetch(`${url}${queryStringParams}`);
-
-    const jsonResponse = await response.json();
-
-    setPagedVehicleModels(jsonResponse);
-  };
 
   const handleChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
+    console.log(name);
+    console.log(value);
     setParams({ ...params, [name]: value });
   };
 
+  const onNextClicked = () => {
+    if (!vehicleModels.hasNext) {
+      return;
+    }
+
+    let page = params.pageNumber++;
+    setParams({ ...params, pageNumber: page });
+    loadVehicleModels();
+  };
+
+  const onPreviousClicked = () => {
+    if (!vehicleModels.hasPrevious) {
+      return;
+    }
+    let page = params.pageNumber--;
+    setParams({ ...params, pageNumber: page });
+    loadVehicleModels();
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    loadVehicleModels();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container">
+        <h2>Loading</h2>
+      </div>
+    );
+  }
   return (
     <div className="container">
-      <h1>Vehiclemodels</h1>
-      <Link to="/vehiclemodels/create">Create</Link>
+      <h1>Vehicle Models</h1>
+      <Link className="create-link" to="/vehiclemakes/create">
+        Create New Model
+      </Link>
+      <hr />
 
-      <form method="get">
-        <div className="form-outline">
-          <p>
-            Search:{" "}
-            <input
-              type="text"
-              name="searchQuery"
-              value={params.searchQuery}
-              onChange={handleChange}
-            />
-          </p>
-        </div>
-        <div className="form-group">
-          <label for="orderByControl">Order by</label>
-          <select className="form-control" id="orderByControl" name="orderBy">
-            <option>Order By</option>
-            <option>name desc</option>
-            <option>name asc</option>
-            <option>abrv desc</option>
-            <option>abrv asc</option>
-          </select>
-        </div>
-        <div className="form-group">
-          <label>Order by</label>
-          <select className="form-control" id="makeNameControl" name="makeName">
-            <option>Make Name</option>
-            {vehicleMakes.map((vehicleMake) => {
-              return <option key={vehicleMake.id}>{vehicleMake.name}</option>;
-            })}
-          </select>
-        </div>
-        <p>
-          Items per page:{" "}
+      <form className="models-query-form" onSubmit={(e) => handleSubmit(e)}>
+        <input
+          value={params.searchQuery}
+          className="search"
+          type="text"
+          name="searchQuery"
+          placeholder="Search.."
+          onChange={(e) => handleChange(e)}
+        />
+
+        <select
+          className="select-make"
+          value={params.makeName}
+          id="selectMakeControl"
+          name="makeName"
+          onChange={(e) => handleChange(e)}
+        >
+          <option> Select Make</option>
+          {vehicleMakes.map((vehicleMake) => {
+            return (
+              <option key={vehicleMake.id} value={vehicleMake.name}>
+                {vehicleMake.name}
+              </option>
+            );
+          })}
+        </select>
+
+        <select
+          className="order-by-select"
+          value={params.orderBy}
+          id="orderByControl"
+          name="orderBy"
+          onChange={(e) => handleChange(e)}
+        >
+          <option>Order By</option>
+          {OrderByOptions.map((option, index) => {
+            return (
+              <option key={index} value={option}>
+                {option}
+              </option>
+            );
+          })}
+        </select>
+
+        <div className="items-per-page">
+          <label htmlFor="pageSize">Page Size</label>
           <input
             type="number"
             name="pageSize"
             value={params.pageSize}
-            onChange={handleChange}
+            onChange={(e) => handleChange(e)}
           />
-        </p>
-        <button type="submit" value="Search" className="btn btn-primary">
+        </div>
+
+        <button type="submit" className="btn btn-primary btn-find-makes">
           Submit
         </button>
+      </form>
+
+      <div className="next-previous">
         <button
+          onClick={onPreviousClicked}
           className={`btn btn-default ${
-            pagedVehicleModels.hasPrevious ? "" : "disabled"
+            vehicleModels.hasPrevious ? "" : "disabled"
           }`}
-          name="pageNumber"
-          value={pagedVehicleModels.currentPage - 1}
         >
           Previous
         </button>
         <button
+          onClick={onNextClicked}
           className={`btn btn-default ${
-            pagedVehicleModels.hasNext ? "" : "disabled"
+            vehicleModels.hasNext ? "" : "disabled"
           }`}
-          name="pageNumber"
-          value={pagedVehicleModels.currentPage + 1}
         >
           Next
         </button>
-      </form>
+      </div>
+
       <table className="table">
         <thead>
           <tr>
@@ -153,20 +179,22 @@ export default function Index() {
           </tr>
         </thead>
         <tbody>
-          {pagedVehicleModels.vehicleModels.map((vehicleModel) => {
+          {vehicleModels.vehicleModels.map((vehicleModel) => {
             return (
               <tr key={vehicleModel.id}>
                 <td>{vehicleModel.name}</td>
                 <td>{vehicleModel.abrv}</td>
                 <td>{vehicleModel.makeName}</td>
                 {
-                  <td>
+                  <td className="vehiclemodels-links">
                     <Link to={`/vehiclemodels/edit/${vehicleModel.id}`}>
                       Edit
                     </Link>
+
                     <Link to={`/vehiclemodels/details/${vehicleModel.id}`}>
                       Details
                     </Link>
+
                     <Link to={`/vehiclemodels/delete/${vehicleModel.id}`}>
                       Delete
                     </Link>
@@ -179,4 +207,6 @@ export default function Index() {
       </table>
     </div>
   );
-}
+};
+
+export default Index;

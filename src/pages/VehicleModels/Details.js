@@ -1,40 +1,43 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-
-const url = "https://localhost:44327/VehicleModels/details";
+import { GetVehicleModel } from "../../common/VehicleModelsService";
+import "./Details.css";
 
 const Details = () => {
-  const [vehicleModel, setVehicleModel] = useState({
-    id: 0,
-    name: "",
-    abrv: "",
-    makeName: "",
-  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [vehicleModel, setVehicleModel] = useState();
   const { id } = useParams();
 
   const getVehicleMake = async () => {
-    const response = await fetch(`${url}/${id}`);
-    const vehicleModel = await response.json();
-    console.log(vehicleModel);
+    let vehicleModel = await GetVehicleModel(id);
     setVehicleModel(vehicleModel);
+    setIsLoading(false);
   };
   useEffect(() => {
     getVehicleMake();
   }, []);
 
+  if (isLoading) {
+    return <h2>Loading...</h2>;
+  }
   return (
     <div className="container">
       <h1>Details</h1>
-      <dl class="row">
-        <dt class="col-sm-2">Name</dt>
-        <dd class="col-sm-10">{vehicleModel.name}</dd>
-        <dt class="col-sm-2">Abrv</dt>
-        <dd class="col-sm-10">{vehicleModel.abrv}</dd>
-        <dt class="col-sm-2">Make Name</dt>
-        <dd class="col-sm-10">{vehicleModel.makeName}</dd>
-      </dl>
-      <Link to="/vehicleModels">Back to List</Link>
+      <hr />
+
+      <div className="details-models-body">
+        <p className="placeholder">Name:</p>
+        <p className="name">{vehicleModel.name}</p>
+        <p className="placeholder">Abrv:</p>
+        <p className="abrv">{vehicleModel.abrv}</p>
+        <p className="placeholder">Abrv:</p>
+        <p className="make-name">{vehicleModel.makeName}</p>
+      </div>
+
+      <Link className="back-to-list" to="/vehicleModels">
+        Back to List
+      </Link>
     </div>
   );
 };

@@ -1,71 +1,60 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-
-const url = "https://localhost:44327/VehicleModels/details";
-const deleteUrl = "https://localhost:44327/VehicleModels/delete";
+import { Link, useParams, useHistory } from "react-router-dom";
+import {
+  GetVehicleModel,
+  DeleteVehicleModel,
+} from "../../common/VehicleModelsService";
+import "./Delete.css";
 
 const Delete = () => {
-  const [vehicleModel, setvehicleModel] = useState({
-    id: 0,
-    name: "",
-    abrv: "",
-    makeName: "",
-  });
+  const history = useHistory();
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [vehicleModel, setvehicleModel] = useState();
   const { id } = useParams();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (vehicleModel.name && vehicleModel.abrv) {
-      const requestOptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      };
-      fetch(`${deleteUrl}/${vehicleModel.id}`, requestOptions).then(
-        (response) => response
-      );
-    }
+    await DeleteVehicleModel(id);
+    history.push("/vehicleModels");
   };
 
   const getvehicleModel = async () => {
-    const response = await fetch(`${url}/${id}`);
-    const vehicleModel = await response.json();
-    console.log(vehicleModel);
+    let vehicleModel = await GetVehicleModel(id);
     setvehicleModel(vehicleModel);
+    setIsLoading(false);
   };
   useEffect(() => {
     getvehicleModel();
   }, []);
+
+  if (isLoading) {
+    return <h2>Loading...</h2>;
+  }
   return (
     <div className="container">
       <h1>Delete</h1>
-      <hr />
       <h3>Are you sure you want to delete this?</h3>
-      <div>
-        <hr />
-        <dl class="row">
-          <dt class="col-sm-2">Name</dt>
-          <dd class="col-sm-10">{vehicleModel.name}</dd>
-          <dt class="col-sm-2">Abrv</dt>
-          <dd class="col-sm-10">{vehicleModel.abrv}</dd>
-          <dt class="col-sm-2">Make Name</dt>
-          <dd class="col-sm-10">{vehicleModel.makeName}</dd>
-        </dl>
+      <hr />
 
-        <form asp-action="Delete">
-          <button
-            type="submit"
-            className="btn btn-danger"
-            onClick={handleSubmit}
-          >
-            Delete
-          </button>
-          <Link to="/vehicleModels">Back to list</Link>
-        </form>
+      <div className="delete-model-body">
+        <p className="name-placeholder">Name:</p>
+        <p className="name">{vehicleModel.name}</p>
+        <p className="abrv-placeholder">Abrv:</p>
+        <p className="abrv">{vehicleModel.abrv}</p>
+        <p className="vehicle-make-placeholder">Vehicle Make:</p>
+        <p className="vehicle-make">{vehicleModel.makeName}</p>
+
+        <button className="btn btn-danger" onClick={handleSubmit}>
+          Delete
+        </button>
       </div>
+
+      <Link className="back-to-list" to="/vehicleModels">
+        Back to list
+      </Link>
     </div>
   );
 };

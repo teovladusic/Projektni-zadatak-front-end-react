@@ -59,7 +59,7 @@ const Edit = () => {
   return (
     <div className="container">
       <h1>Edit</h1>
-      <h4>Vehicle makes</h4>
+      <h4>Vehicle Makes</h4>
       <hr />
       <form>
         <label htmlFor="name">Name : </label>

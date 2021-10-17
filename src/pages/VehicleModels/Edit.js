@@ -1,107 +1,128 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-
-const url = "https://localhost:44327/VehicleModels/details";
-const editUrl = "https://localhost:44327/VehicleModels/edit";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useParams, useHistory } from "react-router-dom";
+import { GetVehicleMakes } from "../../common/VehicleMakesService";
+import {
+  EditVehicleModel,
+  GetVehicleModel,
+} from "../../common/VehicleModelsService";
 
 const Edit = () => {
-  const [vehicleModel, setVehicleModel] = useState({
-    id: 0,
-    name: "",
-    abrv: "",
-    vehicleMakeId: 0,
-  });
+  const history = useHistory();
+
+  const [vehicleModel, setVehicleModel] = useState();
+  const [vehicleMakes, setVehicleMakes] = useState([]);
   const { id } = useParams();
 
-  const handleChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setVehicleModel({ ...vehicleModel, [name]: value });
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [nameError, setNameError] = useState(false);
+  const [abrvError, setAbrvError] = useState(false);
+
+  const refNameContainer = useRef(null);
+  const refAbrvContainer = useRef(null);
+  const refVehicleMakeIdContainer = useRef(null);
+
+  const [defaultMakeId, setDefaultMakeId] = useState(0);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (refNameContainer.current.value) {
+      setNameError(false);
+    } else {
+      setNameError(true);
+      return;
+    }
+
+    if (refAbrvContainer.current.value) {
+      setAbrvError(false);
+    } else {
+      setAbrvError(true);
+      return;
+    }
+
+    let vehicleModel = {
+      id: id,
+      name: refNameContainer.current.value,
+      abrv: refAbrvContainer.current.value,
+      vehicleMakeId: refVehicleMakeIdContainer.current.value,
+    };
+    await EditVehicleModel(vehicleModel);
+    history.push("/vehiclemodels");
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (vehicleModel.name && vehicleModel.abrv) {
-      const requestOptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          id: vehicleModel.id,
-          name: vehicleModel.name,
-          abrv: vehicleModel.abrv,
-          vehicleMakeId: vehicleModel.vehicleMakeId,
-        }),
-      };
-      fetch(editUrl, requestOptions).then((response) => response);
-    }
-  };
-  const getVehicleMake = async () => {
-    const response = await fetch(`${url}/${id}`);
-    const vehicleModel = await response.json();
+  const getVehicleModel = async () => {
+    let vehicleModel = await GetVehicleModel(id);
     setVehicleModel(vehicleModel);
+    let params = {
+      searchQuery: "",
+      pageNumber: 1,
+      pageSize: 50,
+      orderBy: "Order By",
+    };
+    let makes = await GetVehicleMakes(params);
+    setVehicleMakes(makes.vehicleMakes);
+
+    let currentMake = makes.vehicleMakes.filter(
+      (make) => make.name === vehicleModel.makeName
+    );
+
+    setDefaultMakeId(currentMake[0].id);
+    setIsLoading(false);
   };
   useEffect(() => {
-    getVehicleMake();
+    getVehicleModel();
   }, []);
+
+  if (isLoading) {
+    return <h2>Loading...</h2>;
+  }
   return (
     <div className="container">
       <h1>Edit</h1>
-
-      <h4>Vehicle make</h4>
+      <h4>Vehicle Models</h4>
       <hr />
-      <div className="row">
-        <div className="col-md-4">
-          <form>
-            <div className="form-control">
-              <div>
-                <label htmlFor="name">Name : </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={vehicleModel.name}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="abrv">Abrv : </label>
-                <input
-                  type="text"
-                  id="abrv"
-                  name="abrv"
-                  value={vehicleModel.abrv}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="vehicleMakeId">VehicleMakeId : </label>
-                <input
-                  type="number"
-                  id="vehicleMakeId"
-                  name="vehicleMakeId"
-                  value={vehicleModel.vehicleMakeId}
-                  onChange={handleChange}
-                />
-              </div>
-              <div></div>
-            </div>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              onClick={handleSubmit}
-            >
-              Save
-            </button>
-          </form>
-        </div>
-      </div>
-
+      <form>
+        <label htmlFor="name">Name : </label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          ref={refNameContainer}
+          defaultValue={vehicleModel.name}
+          className={`${nameError ? "error" : null}`}
+        />
+        <label htmlFor="abrv">Abrv : </label>
+        <input
+          type="text"
+          id="abrv"
+          name="abrv"
+          className={`${abrvError ? "error" : null}`}
+          ref={refAbrvContainer}
+          defaultValue={vehicleModel.abrv}
+        />
+        <label htmlFor="vehicleMakeId">Make Id : </label>
+        <select ref={refVehicleMakeIdContainer} defaultValue={defaultMakeId}>
+          {vehicleMakes.map((vehicleMake) => {
+            return (
+              <option key={vehicleMake.id} value={vehicleMake.id}>
+                {vehicleMake.name}
+              </option>
+            );
+          })}
+        </select>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          onClick={handleSubmit}
+        >
+          Save
+        </button>
+      </form>
       <div>
-        <Link to="/vehiclemodels">Back to list</Link>
+        <Link className="back-to-list" to="/vehiclemodels">
+          Back to list
+        </Link>
       </div>
     </div>
   );

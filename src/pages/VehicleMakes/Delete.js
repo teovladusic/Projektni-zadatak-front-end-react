@@ -7,8 +7,6 @@ import {
   GetVehicleMake,
 } from "../../common/VehicleMakesService";
 
-const url = "https://localhost:44327/VehicleMakes/details";
-
 const Delete = () => {
   const history = useHistory();
 

@@ -1,10 +1,10 @@
-const createUrl = "https://localhost:44327/VehicleMakes/create";
-const deleteUrl = "https://localhost:44327/VehicleMakes/delete";
-const detailsUrl = "https://localhost:44327/VehicleMakes/details";
-const editUrl = "https://localhost:44327/VehicleMakes/edit";
-const url = "https://localhost:44327/VehicleMakes";
+const createUrl = "https://localhost:44327/VehicleModels/create";
+const deleteUrl = "https://localhost:44327/VehicleModels/delete";
+const detailsUrl = "https://localhost:44327/VehicleModels/details";
+const editUrl = "https://localhost:44327/VehicleModels/edit";
+const url = "https://localhost:44327/VehicleModels";
 
-export const CreateVehicleMake = async (vehicleMake) => {
+export const CreateVehicleModel = async (vehicleModel) => {
   const requestOptions = {
     method: "POST",
     headers: {
@@ -12,15 +12,16 @@ export const CreateVehicleMake = async (vehicleMake) => {
       Accept: "application/json",
     },
     body: JSON.stringify({
-      name: vehicleMake.name,
-      abrv: vehicleMake.abrv,
+      name: vehicleModel.name,
+      abrv: vehicleModel.abrv,
+      vehicleMakeId: vehicleModel.vehicleMakeId,
     }),
   };
 
   await fetch(createUrl, requestOptions);
 };
 
-export const DeleteVehicleMake = async (id) => {
+export const DeleteVehicleModel = async (id) => {
   const requestOptions = {
     method: "POST",
     headers: {
@@ -33,13 +34,13 @@ export const DeleteVehicleMake = async (id) => {
   await response.json();
 };
 
-export const GetVehicleMake = async (id) => {
+export const GetVehicleModel = async (id) => {
   let response = await fetch(`${detailsUrl}/${id}`);
   let json = await response.json();
   return json;
 };
 
-export const EditVehicleMake = async ({ id, name, abrv }) => {
+export const EditVehicleModel = async ({ id, name, abrv, vehicleMakeId }) => {
   const requestOptions = {
     method: "POST",
     headers: {
@@ -51,24 +52,30 @@ export const EditVehicleMake = async ({ id, name, abrv }) => {
       id: id,
       name: name,
       abrv: abrv,
+      vehicleMakeId: vehicleMakeId,
     }),
   };
-  await fetch(editUrl, requestOptions);
+  var response = await fetch(editUrl, requestOptions);
+  console.log(response);
 };
 
-export const GetVehicleMakes = async ({
+export const GetVehicleModels = async ({
   searchQuery,
   pageNumber,
   pageSize,
   orderBy,
+  makeName,
 }) => {
   const queryStringParams = `?SearchQuery=${encodeURIComponent(
     searchQuery
   )}&PageNumber=${encodeURIComponent(pageNumber)}&PageSize=${encodeURIComponent(
     pageSize
-  )}&OrderBy=${encodeURIComponent(orderBy)}`;
+  )}&OrderBy=${encodeURIComponent(orderBy)}&MakeName=${encodeURIComponent(
+    makeName
+  )}`;
 
   const response = await fetch(`${url}${queryStringParams}`);
 
-  return await response.json();
+  const jsonResponse = await response.json();
+  return jsonResponse;
 };

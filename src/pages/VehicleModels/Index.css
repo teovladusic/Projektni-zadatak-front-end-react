@@ -3,11 +3,17 @@
   font-size: 19px;
 }
 
-.makes-query-form {
+.models-query-form {
   display: block;
 }
 
 .search {
+  display: block;
+  width: 30vw;
+  padding: 5px 10px;
+}
+
+.select-make {
   display: block;
   width: 30vw;
   padding: 5px 10px;
@@ -42,11 +48,11 @@ input {
   margin-top: 20px;
 }
 
-.vehiclemakes-links a {
+.vehiclemodels-links a {
   margin: 0px 6px;
   color: black;
 }
 
-.vehiclemakes-links :hover {
+.vehiclemodels-links :hover {
   color: blue;
 }

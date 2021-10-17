@@ -1,0 +1,24 @@
+.back-to-list {
+  width: 100px;
+  font-size: 17px;
+  color: black;
+}
+
+.details-models-body {
+  display: grid;
+  width: 140px;
+  grid-template-columns: 70px 200px;
+  align-content: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.details-models-body .name,
+.abrv,
+.make-name {
+  text-align: end;
+}
+
+.placeholder {
+  font-weight: bold;
+}

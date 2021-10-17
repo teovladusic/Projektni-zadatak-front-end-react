@@ -1,0 +1,31 @@
+.back-to-list {
+  width: 100px;
+  font-size: 17px;
+  color: black;
+}
+
+.delete-model-body {
+  display: grid;
+  width: 140px;
+  grid-template-columns: 70px 200px;
+  align-content: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.delete-model-body .name,
+.abrv,
+.vehicle-make {
+  text-align: end;
+}
+
+.name-placeholder,
+.abrv-placeholder,
+.vehicle-make-placeholder {
+  font-weight: bold;
+}
+
+.delete-model-body button {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Index.css";
-
-const url = "https://localhost:44327/VehicleMakes";
+import { GetVehicleMakes } from "../../common/VehicleMakesService";
+import { OrderByOptions } from "../../common/Utils";
 
 export default function Index() {
   const [pagedVehicleMakes, setPagedVehicleMakes] = useState({});
@@ -22,20 +22,9 @@ export default function Index() {
 
   const getVehicleMakes = async () => {
     setIsLoading(true);
-    const queryStringParams = `?SearchQuery=${encodeURIComponent(
-      params.searchQuery
-    )}&PageNumber=${encodeURIComponent(
-      params.pageNumber
-    )}&PageSize=${encodeURIComponent(
-      params.pageSize
-    )}&OrderBy=${encodeURIComponent(params.orderBy)}`;
-
-    const response = await fetch(`${url}${queryStringParams}`);
-
-    const jsonResponse = await response.json();
-    console.log(jsonResponse);
-    setPagedVehicleMakes(jsonResponse);
-    setParams({ ...params, pageSize: jsonResponse.pageSize });
+    let response = await GetVehicleMakes(params);
+    setPagedVehicleMakes(response);
+    setParams({ ...params, pageSize: response.pageSize });
     setIsLoading(false);
   };
 
@@ -43,13 +32,30 @@ export default function Index() {
     const name = e.target.name;
     const value = e.target.value;
     setParams({ ...params, [name]: value });
-    console.log(e.target.value);
+  };
+
+  const onNextClicked = () => {
+    if (!pagedVehicleMakes.hasNext) {
+      return;
+    }
+
+    let page = params.pageNumber++;
+    setParams({ ...params, pageNumber: page });
+    getVehicleMakes();
+  };
+
+  const onPreviousClicked = () => {
+    if (!pagedVehicleMakes.hasPrevious) {
+      return;
+    }
+    let page = params.pageNumber--;
+    setParams({ ...params, pageNumber: page });
+    getVehicleMakes();
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     getVehicleMakes();
-    console.log("submit");
   };
 
   if (isLoading) {
@@ -61,7 +67,7 @@ export default function Index() {
   }
   return (
     <div className="container">
-      <h1>VehicleMakes</h1>
+      <h1>Vehicle Makes</h1>
       <Link className="create-link" to="/vehiclemakes/create">
         Create New Make
       </Link>
@@ -85,10 +91,9 @@ export default function Index() {
           name="orderBy"
         >
           <option>Order By</option>
-          <option>name desc</option>
-          <option>name asc</option>
-          <option>abrv desc</option>
-          <option>abrv asc</option>
+          {OrderByOptions.map((option) => {
+            return <option>{option}</option>;
+          })}
         </select>
 
         <div className="items-per-page">
@@ -108,6 +113,7 @@ export default function Index() {
 
       <div className="next-previous">
         <button
+          onClick={onPreviousClicked}
           className={`btn btn-default ${
             pagedVehicleMakes.hasPrevious ? "" : "disabled"
           }`}
@@ -115,6 +121,7 @@ export default function Index() {
           Previous
         </button>
         <button
+          onClick={onNextClicked}
           className={`btn btn-default ${
             pagedVehicleMakes.hasNext ? "" : "disabled"
           }`}

@@ -31,7 +31,7 @@ const Details = () => {
         <p className="name">{vehicleModel.name}</p>
         <p className="placeholder">Abrv:</p>
         <p className="abrv">{vehicleModel.abrv}</p>
-        <p className="placeholder">Abrv:</p>
+        <p className="placeholder">Make Name:</p>
         <p className="make-name">{vehicleModel.makeName}</p>
       </div>
 

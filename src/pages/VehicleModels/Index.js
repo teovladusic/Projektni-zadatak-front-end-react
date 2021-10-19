@@ -86,7 +86,7 @@ const Index = () => {
   return (
     <div className="container">
       <h1>Vehicle Models</h1>
-      <Link className="create-link" to="/vehiclemakes/create">
+      <Link className="create-link" to="/vehiclemodels/create">
         Create New Model
       </Link>
       <hr />

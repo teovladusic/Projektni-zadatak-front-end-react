@@ -1,8 +1,9 @@
-const createUrl = "https://localhost:44327/VehicleModels/create";
-const deleteUrl = "https://localhost:44327/VehicleModels/delete";
-const detailsUrl = "https://localhost:44327/VehicleModels/details";
-const editUrl = "https://localhost:44327/VehicleModels/edit";
-const url = "https://localhost:44327/VehicleModels";
+let mainUrl = "https://projektnizadatak.azurewebsites.net/vehiclemodels";
+const url = `${mainUrl}`;
+const createUrl = `${mainUrl}/create`;
+const deleteUrl = `${mainUrl}/delete`;
+const detailsUrl = `${mainUrl}/details`;
+const editUrl = `${mainUrl}/edit`;
 
 export const CreateVehicleModel = async (vehicleModel) => {
   const requestOptions = {

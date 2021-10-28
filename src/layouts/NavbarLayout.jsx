@@ -1,7 +1,8 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
+import { observer } from "mobx-react";
 
-const Navbar = () => {
+const Navbar = observer(({ routerStore }) => {
   return (
     <header>
       <nav className="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -9,6 +10,7 @@ const Navbar = () => {
           <Link className="navbar-brand" to="/">
             Projektni Zadatak
           </Link>
+
           <button
             className="navbar-toggler"
             type="button"
@@ -43,6 +45,6 @@ const Navbar = () => {
       </nav>
     </header>
   );
-};
+});
 
 export default Navbar;

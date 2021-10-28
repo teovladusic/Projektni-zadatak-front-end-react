@@ -1,61 +1,53 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { Link, useParams, useHistory } from "react-router-dom";
-import "./Edit.css";
-import {
-  GetVehicleMake,
-  EditVehicleMake,
-} from "../../common/VehicleMakesService";
+import "./EditPage.css";
+import { observer } from "mobx-react";
 
-const Edit = () => {
+const EditPage = observer(({ vehicleMakesStore }) => {
   const history = useHistory();
-  const [isLoading, setIsLoading] = useState(true);
-  const [vehicleMake, setVehicleMake] = useState();
+
   const { id } = useParams();
-  const [nameError, setNameError] = useState(false);
-  const [abrvError, setAbrvError] = useState(false);
+
   const refNameContainer = useRef(null);
   const refAbrvContainer = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (refNameContainer.current.value) {
-      setNameError(false);
-    } else {
-      setNameError(true);
-      return;
-    }
 
-    if (refAbrvContainer.current.value) {
-      setAbrvError(false);
-    } else {
-      setAbrvError(true);
-      return;
-    }
     let editedVehicleMake = {
       id: id,
       name: refNameContainer.current.value,
       abrv: refAbrvContainer.current.value,
     };
 
-    await EditVehicleMake(editedVehicleMake);
-    history.push("/vehicleMakes");
+    vehicleMakesStore.editVehicleMake(editedVehicleMake);
   };
 
-  const getVehicleMake = async () => {
-    setIsLoading(true);
-    const response = await GetVehicleMake(id);
-    setVehicleMake(response);
-    setIsLoading(false);
+  if (vehicleMakesStore.isEdited) {
+    vehicleMakesStore.isEdited = false;
+    history.push("/vehicleMakes");
+  }
+
+  const loadMake = async () => {
+    let make = await vehicleMakesStore.getVehicleMake(id);
+    vehicleMakesStore.setVehicleMakeToEdit(make);
+    refNameContainer.current.value = make.name;
+    refAbrvContainer.current.value = make.abrv;
   };
 
   useEffect(() => {
-    getVehicleMake();
+    loadMake();
   }, []);
 
-  if (isLoading) {
-    return <h2>Loading...</h2>;
+  if (vehicleMakesStore.isLoading) {
+    return (
+      <div>
+        <h2>Loading...</h2>
+      </div>
+    );
   }
+
   return (
     <div className="container">
       <h1>Edit</h1>
@@ -68,17 +60,16 @@ const Edit = () => {
           id="name"
           name="name"
           ref={refNameContainer}
-          defaultValue={vehicleMake.name}
-          className={`${nameError ? "error" : null}`}
+          className={`${vehicleMakesStore.editMakeError.name ? "error" : null}`}
         />
         <label htmlFor="abrv">Abrv : </label>
         <input
           type="text"
           id="abrv"
           name="abrv"
-          className={`${abrvError ? "error" : null}`}
+          className={`${vehicleMakesStore.editMakeError.abrv ? "error" : null}`}
           ref={refAbrvContainer}
-          defaultValue={vehicleMake.abrv}
+          defaultValue={vehicleMakesStore.vehicleMakeToEdit.abrv}
         />
         <button
           type="submit"
@@ -93,6 +84,6 @@ const Edit = () => {
       </div>
     </div>
   );
-};
+});
 
-export default Edit;
+export default EditPage;

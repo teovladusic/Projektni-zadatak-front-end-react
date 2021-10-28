@@ -1,4 +1,4 @@
-import WelcomeMessage from "../components/WelcomeMessage";
+import WelcomeMessage from "../layouts/WelcomeMessageLayout.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const HomePage = () => {

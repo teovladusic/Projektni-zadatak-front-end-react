@@ -1,13 +1,12 @@
-import "./App.css";
+import React, { Component } from "react";
+import RouterSetup from "./components/RouterSetup";
 
-import Router from "./components/Router";
-
-function App() {
-  return (
-    <>
-      <Router />
-    </>
-  );
+export default class App extends Component {
+  render() {
+    return (
+      <>
+        <RouterSetup />
+      </>
+    );
+  }
 }
-
-export default App;

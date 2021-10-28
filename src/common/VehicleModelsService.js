@@ -78,5 +78,6 @@ export const GetVehicleModels = async ({
   const response = await fetch(`${url}${queryStringParams}`);
 
   const jsonResponse = await response.json();
+
   return jsonResponse;
 };

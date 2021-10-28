@@ -1,54 +1,26 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
-import "./Create.css";
-import { GetVehicleMakes } from "../../common/VehicleMakesService";
-import { CreateVehicleModel } from "../../common/VehicleModelsService";
+import "./CreatePage.css";
+import { observer } from "mobx-react";
 
-const Create = () => {
-  var [vehicleMakes, setVehicleMakes] = useState([]);
+const CreatePage = observer(({ vehicleModelsStore }) => {
   const history = useHistory();
-
-  const [abrvError, setAbrvError] = useState(false);
-  const [nameError, setNameError] = useState(false);
 
   const refNameContainer = useRef(null);
   const refAbrvContainer = useRef(null);
   const refVehicleMakeIdContainer = useRef(null);
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  const LoadVehicleMakes = async () => {
-    let params = {
-      searchQuery: "",
-      pageNumber: 1,
-      pageSize: 50,
-      orderBy: "Order By",
-    };
-    let makes = await GetVehicleMakes(params);
-    setVehicleMakes(makes.vehicleMakes);
-    setIsLoading(false);
+  const load = async () => {
+    vehicleModelsStore.loadVehicleModels();
   };
 
   useEffect(() => {
-    LoadVehicleMakes();
+    load();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (refNameContainer.current.value) {
-      setNameError(false);
-    } else {
-      setNameError(true);
-      return;
-    }
-
-    if (refAbrvContainer.current.value) {
-      setAbrvError(false);
-    } else {
-      setAbrvError(true);
-      return;
-    }
 
     let vehicleModel = {
       name: refNameContainer.current.value,
@@ -56,12 +28,20 @@ const Create = () => {
       vehicleMakeId: refVehicleMakeIdContainer.current.value,
     };
 
-    await CreateVehicleModel(vehicleModel);
-    history.push("/vehiclemodels");
+    await vehicleModelsStore.createVehicleModel(vehicleModel);
   };
 
-  if (isLoading) {
-    return <h2>Loading...</h2>;
+  if (vehicleModelsStore.isCreated) {
+    vehicleModelsStore.setIsCreated(false);
+    history.push("/vehiclemodels");
+  }
+
+  if (vehicleModelsStore.isLoading) {
+    return (
+      <div>
+        <h2>Loading...</h2>
+      </div>
+    );
   }
 
   return (
@@ -79,7 +59,9 @@ const Create = () => {
           id="name"
           name="name"
           ref={refNameContainer}
-          className={`${nameError ? "error" : null}`}
+          className={`${
+            vehicleModelsStore.createModelError.name ? "error" : null
+          }`}
         />
 
         <label id="label-abrv" htmlFor="abrv">
@@ -90,12 +72,14 @@ const Create = () => {
           id="abrv"
           name="abrv"
           ref={refAbrvContainer}
-          className={`${abrvError ? "error" : null}`}
+          className={`${
+            vehicleModelsStore.createModelError.abrv ? "error" : null
+          }`}
         />
 
         <label htmlFor="selectMake">Vehicle Make:</label>
         <select ref={refVehicleMakeIdContainer}>
-          {vehicleMakes.map((vehicleMake) => {
+          {vehicleModelsStore.vehicleMakes.map((vehicleMake) => {
             return (
               <option value={vehicleMake.id} key={vehicleMake.id}>
                 {vehicleMake.name}
@@ -114,6 +98,6 @@ const Create = () => {
       </form>
     </div>
   );
-};
+});
 
-export default Create;
+export default CreatePage;

@@ -5,7 +5,7 @@ import "./IndexPage.css";
 import VehicleModelsFormComponent from "./VehicleModelsFormComponent";
 import VehicleModelsListComponent from "./VehicleModelsListComponent";
 
-const IndexPage = ({ vehicleModelsStore }) => {
+const IndexPage = () => {
   return (
     <div className="container">
       <h1>Vehicle Models</h1>
@@ -14,8 +14,8 @@ const IndexPage = ({ vehicleModelsStore }) => {
       </Link>
       <hr />
 
-      <VehicleModelsFormComponent vehicleModelsStore={vehicleModelsStore} />
-      <VehicleModelsListComponent vehicleModelsStore={vehicleModelsStore} />
+      <VehicleModelsFormComponent />
+      <VehicleModelsListComponent />
     </div>
   );
 };

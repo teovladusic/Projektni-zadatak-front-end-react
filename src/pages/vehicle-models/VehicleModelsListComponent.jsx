@@ -1,8 +1,9 @@
 import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
+import VehicleModelsIndexStore from "../../stores/vehicle-models/VehicleModelsIndexStore";
 
-const VehicleModelsListComponent = observer(({ vehicleModelsStore }) => {
-  if (vehicleModelsStore.isLoading) {
+const VehicleModelsListComponent = observer(() => {
+  if (VehicleModelsIndexStore.isLoading) {
     return (
       <div>
         <h2>Loading...</h2>
@@ -20,7 +21,7 @@ const VehicleModelsListComponent = observer(({ vehicleModelsStore }) => {
         </tr>
       </thead>
       <tbody>
-        {vehicleModelsStore.pagedVehicleModels.vehicleModels.map(
+        {VehicleModelsIndexStore.pagedVehicleModels.vehicleModels.map(
           (vehicleModel) => {
             return (
               <tr key={vehicleModel.id}>

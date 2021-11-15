@@ -2,8 +2,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { observer } from "mobx-react";
 import React, { useEffect, useRef } from "react";
 import { Link, useParams, useHistory } from "react-router-dom";
+import EditModelStore from "../../stores/vehicle-models/EditModelStore";
 
-const EditPage = observer(({ vehicleModelsStore }) => {
+const EditPage = observer(() => {
   const history = useHistory();
 
   const { id } = useParams();
@@ -21,26 +22,14 @@ const EditPage = observer(({ vehicleModelsStore }) => {
       abrv: abrvRefContainer.current.value,
       vehicleMakeId: vehicleMakeIdRefContainer.current.value,
     };
-    await vehicleModelsStore.editVehicleModel(vehicleModel);
+    await EditModelStore.editVehicleModel(vehicleModel);
   };
 
-  if (vehicleModelsStore.isEdited) {
+  if (EditModelStore.isEdited) {
     history.push("/vehiclemodels");
   }
 
-  const getVehicleModel = async () => {
-    let model = await vehicleModelsStore.getVehicleModel(id);
-    await vehicleModelsStore.setVehicleModelToEdit(model);
-    abrvRefContainer.current.value = model.abrv;
-    nameRefContainer.current.value = model.name;
-    vehicleMakeIdRefContainer.current.value =
-      vehicleModelsStore.vehicleModelToEditMake.id;
-  };
-  useEffect(() => {
-    getVehicleModel();
-  }, []);
-
-  if (vehicleModelsStore.isLoading) {
+  if (EditModelStore.isLoading) {
     return <h2>Loading...</h2>;
   }
   return (
@@ -55,27 +44,24 @@ const EditPage = observer(({ vehicleModelsStore }) => {
           id="name"
           name="name"
           ref={nameRefContainer}
-          className={`${
-            vehicleModelsStore.editModelErrror.name ? "error" : null
-          }`}
+          defaultValue={EditModelStore.vehicleModelToEdit.name}
+          className={`${EditModelStore.editModelErrror.name ? "error" : null}`}
         />
         <label htmlFor="abrv">Abrv : </label>
         <input
           type="text"
           id="abrv"
           name="abrv"
-          className={`${
-            vehicleModelsStore.editModelErrror.abrv ? "error" : null
-          }`}
+          className={`${EditModelStore.editModelErrror.abrv ? "error" : null}`}
           ref={abrvRefContainer}
-          defaultValue={vehicleModelsStore.vehicleModelToEdit.abrv}
+          defaultValue={EditModelStore.vehicleModelToEdit.abrv}
         />
         <label htmlFor="vehicleMakeId">Make : </label>
         <select
           ref={vehicleMakeIdRefContainer}
-          defaultValue={vehicleModelsStore.vehicleModelToEditMake.id}
+          defaultValue={EditModelStore.vehicleModelToEditMake.id}
         >
-          {vehicleModelsStore.vehicleMakes.map((vehicleMake) => {
+          {EditModelStore.vehicleMakes.map((vehicleMake) => {
             return (
               <option key={vehicleMake.id} value={vehicleMake.id}>
                 {vehicleMake.name}

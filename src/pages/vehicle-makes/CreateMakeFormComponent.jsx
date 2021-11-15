@@ -1,8 +1,9 @@
 import { observer } from "mobx-react";
 import { useRef } from "react";
 import { useHistory } from "react-router";
+import CreateMakeStore from "../../stores/vehicle-makes/CreateMakeStore";
 
-const CreateMakeFormComponent = observer(({ vehicleMakesStore }) => {
+const CreateMakeFormComponent = observer(() => {
   const history = useHistory();
 
   const nameRefContainer = useRef(null);
@@ -15,13 +16,12 @@ const CreateMakeFormComponent = observer(({ vehicleMakesStore }) => {
       abrv: abrvRefContainer.current.value,
     };
 
-    vehicleMakesStore.createVehicleMake(newMake);
+    CreateMakeStore.createVehicleMake(newMake);
   };
 
-  if (vehicleMakesStore.isCreated) {
+  if (CreateMakeStore.isCreated) {
     history.push("/vehicleMakes");
-    vehicleMakesStore.loadVehicleMakes();
-    vehicleMakesStore.isCreated = false;
+    CreateMakeStore.isCreated = false;
   }
 
   return (
@@ -34,7 +34,7 @@ const CreateMakeFormComponent = observer(({ vehicleMakesStore }) => {
         id="name"
         name="name"
         ref={nameRefContainer}
-        className={`${vehicleMakesStore.createMakeError.name ? "error" : null}`}
+        className={`${CreateMakeStore.createMakeError.name ? "error" : null}`}
       />
 
       <label id="label-abrv" htmlFor="abrv">
@@ -45,7 +45,7 @@ const CreateMakeFormComponent = observer(({ vehicleMakesStore }) => {
         id="abrv"
         name="abrv"
         ref={abrvRefContainer}
-        className={`${vehicleMakesStore.createMakeError.abrv ? "error" : null}`}
+        className={`${CreateMakeStore.createMakeError.abrv ? "error" : null}`}
       />
 
       <button type="submit" className="btn btn-primary" onClick={handleSubmit}>

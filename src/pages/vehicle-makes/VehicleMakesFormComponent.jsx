@@ -1,8 +1,8 @@
 import { OrderByOptions } from "../../common/Utils";
-import { observer } from "mobx-react";
+import { inject, observer } from "mobx-react";
 import { useRef } from "react";
 
-const VehicleMakesFormComponent = observer(({ vehicleMakesStore }) => {
+const VehicleMakesFormComponent = observer(({ store }) => {
   const searchQueryRefContainer = useRef(null);
   const orderByRefContainer = useRef(null);
   const pageSizeRefContainer = useRef(null);
@@ -10,29 +10,35 @@ const VehicleMakesFormComponent = observer(({ vehicleMakesStore }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let newParams = {
-      pageNumber: vehicleMakesStore.params.pageNumber,
+      pageNumber: store.params.pageNumber,
       searchQuery: searchQueryRefContainer.current.value,
       orderBy: orderByRefContainer.current.value,
       pageSize: pageSizeRefContainer.current.value,
     };
-    vehicleMakesStore.updateParamsAndLoadVehicleMakes(newParams);
+    store.updateParamsAndLoadVehicleMakes(newParams);
   };
 
   const onNextPageClick = async () => {
-    if (!vehicleMakesStore.pagedVehicleMakes.hasNext) return;
-    let nextPage = vehicleMakesStore.pagedVehicleMakes.currentPage + 1;
-    let newParams = { ...vehicleMakesStore.params, pageNumber: nextPage };
-    vehicleMakesStore.updateParamsAndLoadVehicleMakes(newParams);
+    if (!store.pagedVehicleMakes.hasNext) return;
+    let nextPage = store.pagedVehicleMakes.currentPage + 1;
+    let newParams = {
+      ...store.params,
+      pageNumber: nextPage,
+    };
+    store.updateParamsAndLoadVehicleMakes(newParams);
   };
 
   const onPrevPageClick = async () => {
-    if (!vehicleMakesStore.pagedVehicleMakes.hasPrevious) return;
-    let prevPage = vehicleMakesStore.pagedVehicleMakes.currentPage - 1;
-    let newParams = { ...vehicleMakesStore.params, pageNumber: prevPage };
-    vehicleMakesStore.updateParamsAndLoadVehicleMakes(newParams);
+    if (!store.pagedVehicleMakes.hasPrevious) return;
+    let prevPage = store.pagedVehicleMakes.currentPage - 1;
+    let newParams = {
+      ...store.params,
+      pageNumber: prevPage,
+    };
+    store.updateParamsAndLoadVehicleMakes(newParams);
   };
 
-  if (vehicleMakesStore.isLoading) {
+  if (store.isLoading) {
     return <></>;
   }
 
@@ -45,7 +51,7 @@ const VehicleMakesFormComponent = observer(({ vehicleMakesStore }) => {
           name="searchQuery"
           placeholder="Search.."
           ref={searchQueryRefContainer}
-          defaultValue={vehicleMakesStore.params.searchQuery}
+          defaultValue={store.params.searchQuery}
         />
 
         <select
@@ -53,7 +59,7 @@ const VehicleMakesFormComponent = observer(({ vehicleMakesStore }) => {
           id="orderByControl"
           name="orderBy"
           ref={orderByRefContainer}
-          defaultValue={vehicleMakesStore.params.orderBy}
+          defaultValue={store.params.orderBy}
         >
           <option>Order By</option>
           {OrderByOptions.map((option, index) => {
@@ -67,7 +73,7 @@ const VehicleMakesFormComponent = observer(({ vehicleMakesStore }) => {
             type="number"
             name="pageSize"
             ref={pageSizeRefContainer}
-            defaultValue={vehicleMakesStore.params.pageSize}
+            defaultValue={store.params.pageSize}
           />
         </div>
 
@@ -79,7 +85,7 @@ const VehicleMakesFormComponent = observer(({ vehicleMakesStore }) => {
       <div className="next-previous">
         <button
           className={`btn btn-default ${
-            vehicleMakesStore.pagedVehicleMakes.hasPrevious ? "" : "disabled"
+            store.pagedVehicleMakes.hasPrevious ? "" : "disabled"
           }`}
           onClick={onPrevPageClick}
         >
@@ -87,7 +93,7 @@ const VehicleMakesFormComponent = observer(({ vehicleMakesStore }) => {
         </button>
         <button
           className={`btn btn-default ${
-            vehicleMakesStore.pagedVehicleMakes.hasNext ? "" : "disabled"
+            store.pagedVehicleMakes.hasNext ? "" : "disabled"
           }`}
           onClick={onNextPageClick}
         >
@@ -97,5 +103,4 @@ const VehicleMakesFormComponent = observer(({ vehicleMakesStore }) => {
     </div>
   );
 });
-
 export default VehicleMakesFormComponent;

@@ -1,33 +1,25 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, useParams, useHistory } from "react-router-dom";
 import "./DeletePage.css";
 import { observer } from "mobx-react";
+import DeleteMakeStore from "../../stores/vehicle-makes/DeleteMakeStore";
 
-const DeletePage = observer(({ vehicleMakesStore }) => {
+const DeletePage = observer(() => {
   const history = useHistory();
   const { id } = useParams();
 
-  const loadVehicleMake = async () => {
-    let make = await vehicleMakesStore.getVehicleMake(id);
-    vehicleMakesStore.setVehicleMakeToDelete(make);
-  };
-
-  useEffect(() => {
-    loadVehicleMake();
-  }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await vehicleMakesStore.deleteVehicleMake(id);
+    await DeleteMakeStore.deleteVehicleMake(id);
   };
 
-  if (vehicleMakesStore.isDeleted) {
-    vehicleMakesStore.isDeleted = false;
+  if (DeleteMakeStore.isDeleted) {
+    DeleteMakeStore.isDeleted = false;
     history.push("/vehicleMakes");
   }
 
-  if (vehicleMakesStore.isLoading) {
+  if (DeleteMakeStore.isLoading) {
     return (
       <div>
         <h2>Loading...</h2>
@@ -46,9 +38,9 @@ const DeletePage = observer(({ vehicleMakesStore }) => {
 
       <div className="delete-make-body">
         <p className="name-placeholder">Name:</p>
-        <p className="name">{vehicleMakesStore.vehicleMakeToDelete.name}</p>
+        <p className="name">{DeleteMakeStore.vehicleMakeToDelete.name}</p>
         <p className="abrv-placeholder">Abrv:</p>
-        <p className="abrv">{vehicleMakesStore.vehicleMakeToDelete.abrv}</p>
+        <p className="abrv">{DeleteMakeStore.vehicleMakeToDelete.abrv}</p>
 
         <button className="btn btn-danger" onClick={handleSubmit}>
           Delete

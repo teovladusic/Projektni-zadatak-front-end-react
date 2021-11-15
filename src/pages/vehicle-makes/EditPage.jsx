@@ -1,10 +1,11 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import { Link, useParams, useHistory } from "react-router-dom";
 import "./EditPage.css";
 import { observer } from "mobx-react";
+import EditMakeStore from "../../stores/vehicle-makes/EditMakeStore";
 
-const EditPage = observer(({ vehicleMakesStore }) => {
+const EditPage = observer(() => {
   const history = useHistory();
 
   const { id } = useParams();
@@ -21,26 +22,15 @@ const EditPage = observer(({ vehicleMakesStore }) => {
       abrv: refAbrvContainer.current.value,
     };
 
-    vehicleMakesStore.editVehicleMake(editedVehicleMake);
+    EditMakeStore.editVehicleMake(editedVehicleMake);
   };
 
-  if (vehicleMakesStore.isEdited) {
-    vehicleMakesStore.isEdited = false;
+  if (EditMakeStore.isEdited) {
+    EditMakeStore.isEdited = false;
     history.push("/vehicleMakes");
   }
 
-  const loadMake = async () => {
-    let make = await vehicleMakesStore.getVehicleMake(id);
-    vehicleMakesStore.setVehicleMakeToEdit(make);
-    refNameContainer.current.value = make.name;
-    refAbrvContainer.current.value = make.abrv;
-  };
-
-  useEffect(() => {
-    loadMake();
-  }, []);
-
-  if (vehicleMakesStore.isLoading) {
+  if (EditMakeStore.isLoading) {
     return (
       <div>
         <h2>Loading...</h2>
@@ -59,17 +49,18 @@ const EditPage = observer(({ vehicleMakesStore }) => {
           type="text"
           id="name"
           name="name"
+          defaultValue={EditMakeStore.vehicleMakeToEdit.name}
           ref={refNameContainer}
-          className={`${vehicleMakesStore.editMakeError.name ? "error" : null}`}
+          className={`${EditMakeStore.editMakeError.name ? "error" : null}`}
         />
         <label htmlFor="abrv">Abrv : </label>
         <input
           type="text"
           id="abrv"
           name="abrv"
-          className={`${vehicleMakesStore.editMakeError.abrv ? "error" : null}`}
+          className={`${EditMakeStore.editMakeError.abrv ? "error" : null}`}
           ref={refAbrvContainer}
-          defaultValue={vehicleMakesStore.vehicleMakeToEdit.abrv}
+          defaultValue={EditMakeStore.vehicleMakeToEdit.abrv}
         />
         <button
           type="submit"

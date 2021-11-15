@@ -3,19 +3,12 @@ import React, { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import "./DetailsPage.css";
 import { observer } from "mobx-react";
+import ModelDetailsStore from "../../stores/vehicle-models/ModelDetailsStore";
 
-const DetailsPage = observer(({ vehicleModelsStore }) => {
+const DetailsPage = observer(() => {
   const { id } = useParams();
 
-  const getVehicleMake = async () => {
-    let model = await vehicleModelsStore.getVehicleModel(id);
-    vehicleModelsStore.setVehicleModelToSeeDetails(model);
-  };
-  useEffect(() => {
-    getVehicleMake();
-  }, []);
-
-  if (vehicleModelsStore.isLoading) {
+  if (ModelDetailsStore.isLoading) {
     return (
       <div>
         <h2>Loading...</h2>
@@ -30,15 +23,15 @@ const DetailsPage = observer(({ vehicleModelsStore }) => {
       <div className="details-models-body">
         <p className="placeholder">Name:</p>
         <p className="name">
-          {vehicleModelsStore.vehicleModelToSeeDetails.name}
+          {ModelDetailsStore.vehicleModelToSeeDetails.name}
         </p>
         <p className="placeholder">Abrv:</p>
         <p className="abrv">
-          {vehicleModelsStore.vehicleModelToSeeDetails.abrv}
+          {ModelDetailsStore.vehicleModelToSeeDetails.abrv}
         </p>
         <p className="placeholder">Make Name:</p>
         <p className="make-name">
-          {vehicleModelsStore.vehicleModelToSeeDetails.makeName}
+          {ModelDetailsStore.vehicleModelToSeeDetails.makeName}
         </p>
       </div>
 

@@ -1,35 +1,28 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { observer } from "mobx-react";
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, useParams, useHistory } from "react-router-dom";
 import "./DeletePage.css";
+import DeleteModelStore from "../../stores/vehicle-models/DeleteModelStore";
 
-const DeletePage = observer(({ vehicleModelsStore }) => {
+const DeletePage = observer(() => {
   const history = useHistory();
   const { id } = useParams();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await vehicleModelsStore.deleteVehicleModel(
-      vehicleModelsStore.vehicleModelToDelete.id
+    await DeleteModelStore.deleteVehicleModel(
+      DeleteModelStore.vehicleModelToDelete.id
     );
   };
 
-  if (vehicleModelsStore.isDeleted) {
-    vehicleModelsStore.setIsDeleted(false);
+  if (DeleteModelStore.isDeleted) {
+    DeleteModelStore.setIsDeleted(false);
     history.push("/vehicleModels");
   }
 
-  const getvehicleModel = async () => {
-    let model = await vehicleModelsStore.getVehicleModel(id);
-    vehicleModelsStore.setVehicleModelToDelete(model);
-  };
-  useEffect(() => {
-    getvehicleModel();
-  }, []);
-
-  if (vehicleModelsStore.isLoading) {
+  if (DeleteModelStore.isLoading) {
     return (
       <div>
         <h2>Loading...</h2>
@@ -44,12 +37,12 @@ const DeletePage = observer(({ vehicleModelsStore }) => {
 
       <div className="delete-model-body">
         <p className="name-placeholder">Name:</p>
-        <p className="name">{vehicleModelsStore.vehicleModelToDelete.name}</p>
+        <p className="name">{DeleteModelStore.vehicleModelToDelete.name}</p>
         <p className="abrv-placeholder">Abrv:</p>
-        <p className="abrv">{vehicleModelsStore.vehicleModelToDelete.abrv}</p>
+        <p className="abrv">{DeleteModelStore.vehicleModelToDelete.abrv}</p>
         <p className="vehicle-make-placeholder">Vehicle Make:</p>
         <p className="vehicle-make">
-          {vehicleModelsStore.vehicleModelToDelete.makeName}
+          {DeleteModelStore.vehicleModelToDelete.makeName}
         </p>
 
         <button className="btn btn-danger" onClick={handleSubmit}>

@@ -1,8 +1,9 @@
 import { observer } from "mobx-react";
 import { useRef } from "react";
 import { OrderByOptions } from "../../common/Utils";
+import VehicleModelsIndexStore from "../../stores/vehicle-models/VehicleModelsIndexStore";
 
-const VehicleModelsFormComponent = observer(({ vehicleModelsStore }) => {
+const VehicleModelsFormComponent = observer(() => {
   const searchQueryRefContainer = useRef(null);
   const orderByRefContainer = useRef(null);
   const pageSizeRefContainer = useRef(null);
@@ -15,34 +16,20 @@ const VehicleModelsFormComponent = observer(({ vehicleModelsStore }) => {
       orderBy: orderByRefContainer.current.value,
       makeName: makeNameRefContainer.current.value,
       pageSize: pageSizeRefContainer.current.value,
-      pageNumber: vehicleModelsStore.params.pageNumber,
+      pageNumber: VehicleModelsIndexStore.params.pageNumber,
     };
 
-    vehicleModelsStore.updateParamsAndLoadVehicleModels(newParams);
+    VehicleModelsIndexStore.updateParamsAndLoadVehicleModels(newParams);
   };
 
-  const onNextClicked = () => {
-    if (!vehicleModelsStore.pagedVehicleModels.hasNext) return;
-    let nextPage = vehicleModelsStore.pagedVehicleModels.currentPage + 1;
-    let newParams = { ...vehicleModelsStore.params, pageNumber: nextPage };
-    vehicleModelsStore.updateParamsAndLoadVehicleModels(newParams);
-  };
-
-  const onPreviousClicked = () => {
-    if (!vehicleModelsStore.pagedVehicleModels.hasPrevious) return;
-    let prevPage = vehicleModelsStore.pagedVehicleModels.currentPage - 1;
-    let newParams = { ...vehicleModelsStore.params, pageNumber: prevPage };
-    vehicleModelsStore.updateParamsAndLoadVehicleModels(newParams);
-  };
-
-  if (vehicleModelsStore.isLoading) {
+  if (VehicleModelsIndexStore.isLoading) {
     return <></>;
   }
   return (
     <>
       <form className="models-query-form" onSubmit={(e) => handleSubmit(e)}>
         <input
-          defaultValue={vehicleModelsStore.params.searchQuery}
+          defaultValue={VehicleModelsIndexStore.params.searchQuery}
           className="search"
           type="text"
           name="searchQuery"
@@ -52,13 +39,13 @@ const VehicleModelsFormComponent = observer(({ vehicleModelsStore }) => {
 
         <select
           className="select-make"
-          defaultValue={vehicleModelsStore.params.makeName}
+          defaultValue={VehicleModelsIndexStore.params.makeName}
           id="selectMakeControl"
           name="makeName"
           ref={makeNameRefContainer}
         >
           <option> Select Make</option>
-          {vehicleModelsStore.vehicleMakes.map((vehicleMake) => {
+          {VehicleModelsIndexStore.vehicleMakes.map((vehicleMake) => {
             return (
               <option key={vehicleMake.id} value={vehicleMake.name}>
                 {vehicleMake.name}
@@ -69,7 +56,7 @@ const VehicleModelsFormComponent = observer(({ vehicleModelsStore }) => {
 
         <select
           className="order-by-select"
-          defaultValue={vehicleModelsStore.params.orderBy}
+          defaultValue={VehicleModelsIndexStore.params.orderBy}
           id="orderByControl"
           name="orderBy"
           ref={orderByRefContainer}
@@ -89,7 +76,7 @@ const VehicleModelsFormComponent = observer(({ vehicleModelsStore }) => {
           <input
             type="number"
             name="pageSize"
-            defaultValue={vehicleModelsStore.params.pageSize}
+            defaultValue={VehicleModelsIndexStore.params.pageSize}
             ref={pageSizeRefContainer}
           />
         </div>
@@ -101,17 +88,19 @@ const VehicleModelsFormComponent = observer(({ vehicleModelsStore }) => {
 
       <div className="next-previous">
         <button
-          onClick={onPreviousClicked}
+          onClick={() => VehicleModelsIndexStore.onPreviousPageClicked()}
           className={`btn btn-default ${
-            vehicleModelsStore.pagedVehicleModels.hasPrevious ? "" : "disabled"
+            VehicleModelsIndexStore.pagedVehicleModels.hasPrevious
+              ? ""
+              : "disabled"
           }`}
         >
           Previous
         </button>
         <button
-          onClick={onNextClicked}
+          onClick={() => VehicleModelsIndexStore.onNextPageClicked()}
           className={`btn btn-default ${
-            vehicleModelsStore.pagedVehicleModels.hasNext ? "" : "disabled"
+            VehicleModelsIndexStore.pagedVehicleModels.hasNext ? "" : "disabled"
           }`}
         >
           Next

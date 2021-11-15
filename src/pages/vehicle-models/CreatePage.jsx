@@ -1,23 +1,16 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { useHistory } from "react-router-dom";
 import "./CreatePage.css";
 import { observer } from "mobx-react";
+import CreateModelStore from "../../stores/vehicle-models/CreateModelStore";
 
-const CreatePage = observer(({ vehicleModelsStore }) => {
+const CreatePage = observer(() => {
   const history = useHistory();
 
   const refNameContainer = useRef(null);
   const refAbrvContainer = useRef(null);
   const refVehicleMakeIdContainer = useRef(null);
-
-  const load = async () => {
-    vehicleModelsStore.loadVehicleModels();
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,15 +21,15 @@ const CreatePage = observer(({ vehicleModelsStore }) => {
       vehicleMakeId: refVehicleMakeIdContainer.current.value,
     };
 
-    await vehicleModelsStore.createVehicleModel(vehicleModel);
+    await CreateModelStore.createVehicleModel(vehicleModel);
   };
 
-  if (vehicleModelsStore.isCreated) {
-    vehicleModelsStore.setIsCreated(false);
+  if (CreateModelStore.isCreated) {
+    CreateModelStore.setIsCreated(false);
     history.push("/vehiclemodels");
   }
 
-  if (vehicleModelsStore.isLoading) {
+  if (CreateModelStore.isLoading) {
     return (
       <div>
         <h2>Loading...</h2>
@@ -60,7 +53,7 @@ const CreatePage = observer(({ vehicleModelsStore }) => {
           name="name"
           ref={refNameContainer}
           className={`${
-            vehicleModelsStore.createModelError.name ? "error" : null
+            CreateModelStore.createModelError.name ? "error" : null
           }`}
         />
 
@@ -73,13 +66,13 @@ const CreatePage = observer(({ vehicleModelsStore }) => {
           name="abrv"
           ref={refAbrvContainer}
           className={`${
-            vehicleModelsStore.createModelError.abrv ? "error" : null
+            CreateModelStore.createModelError.abrv ? "error" : null
           }`}
         />
 
         <label htmlFor="selectMake">Vehicle Make:</label>
         <select ref={refVehicleMakeIdContainer}>
-          {vehicleModelsStore.vehicleMakes.map((vehicleMake) => {
+          {CreateModelStore.vehicleMakes.map((vehicleMake) => {
             return (
               <option value={vehicleMake.id} key={vehicleMake.id}>
                 {vehicleMake.name}

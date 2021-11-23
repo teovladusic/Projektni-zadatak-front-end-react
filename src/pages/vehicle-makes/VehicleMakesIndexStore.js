@@ -3,8 +3,8 @@ import VehicleMakesService from "../../common/VehicleMakesService";
 
 class VehicleMakesIndexStore {
   constructor() {
-    makeAutoObservable(this);
     this.loadVehicleMakes();
+    makeAutoObservable(this);
   }
 
   pagedVehicleMakes = { vehicleMakes: [] };
@@ -21,6 +21,14 @@ class VehicleMakesIndexStore {
     pageNumber: 1,
   };
 
+  setParams(params) {
+    this.params = params;
+  }
+
+  setPagedVehicleMakes(pagedVehicleMakes) {
+    this.pagedVehicleMakes = pagedVehicleMakes;
+  }
+
   async updateParamsAndLoadVehicleMakes(params) {
     this.params = params;
     await this.loadVehicleMakes();
@@ -28,12 +36,15 @@ class VehicleMakesIndexStore {
 
   async loadVehicleMakes() {
     this.setIsLoading(true);
-    this.pagedVehicleMakes = await VehicleMakesService.getVehicleMakes(
-      this.params
-    );
-    this.params = { ...this.params, pageSize: this.pagedVehicleMakes.pageSize };
+    let newMakes = await VehicleMakesService.getVehicleMakes(this.params);
+    this.setPagedVehicleMakes(newMakes);
+    let newParams = {
+      ...this.params,
+      pageSize: this.pagedVehicleMakes.pageSize,
+    };
+    this.setParams(newParams);
     this.setIsLoading(false);
   }
 }
 
-export default VehicleMakesIndexStore = VehicleMakesIndexStore;
+export default VehicleMakesIndexStore;

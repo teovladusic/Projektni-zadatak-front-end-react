@@ -4,15 +4,24 @@ import VehicleMakesService from "../../common/VehicleMakesService";
 class DeleteMakeStore {
   constructor() {
     makeAutoObservable(this);
-    this.loadVehicleMakeToDelete();
   }
+
+  onIdAssigned(id) {
+    this.loadVehicleMakeToDelete(id);
+  }
+
+  isLoading = false;
 
   vehicleMakeToDelete = { name: "", abrv: "" };
   isDeleted = false;
 
-  async loadVehicleMakeToDelete() {
-    let make = await VehicleMakesService.getVehicleMake(2);
+  async loadVehicleMakeToDelete(id) {
+    let make = await VehicleMakesService.getVehicleMake(id);
     this.setVehicleMakeToDelete(make);
+  }
+
+  setIsLoading(isLoading) {
+    this.isLoading = isLoading;
   }
 
   setIsDeleted(isDeleted) {
@@ -30,9 +39,8 @@ class DeleteMakeStore {
     } catch {
       this.setIsLoading(false);
       this.setIsDeleted(true);
-      this.loadVehicleMakes();
     }
   }
 }
 
-export default DeleteMakeStore = new DeleteMakeStore();
+export default DeleteMakeStore;

@@ -4,7 +4,10 @@ import VehicleModelsService from "../../common/VehicleModelsService";
 class DeleteModelStore {
   constructor() {
     makeAutoObservable(this);
-    this.getVehicleModelToDelete(2);
+  }
+
+  onIdAssigned(id) {
+    this.getVehicleModelToDelete(id);
   }
 
   isLoading = false;
@@ -34,10 +37,10 @@ class DeleteModelStore {
     try {
       await VehicleModelsService.deleteVehicleModel(id);
     } catch {
-      this.setIsLoading(false);
       this.setIsDeleted(true);
+      this.setIsLoading(false);
     }
   }
 }
 
-export default DeleteModelStore = new DeleteModelStore();
+export default DeleteModelStore;

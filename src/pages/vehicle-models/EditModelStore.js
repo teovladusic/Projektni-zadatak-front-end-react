@@ -5,7 +5,6 @@ import VehicleMakesService from "../../common/VehicleMakesService";
 class EditModelStore {
   constructor() {
     makeAutoObservable(this);
-    this.loadVehicleModelToEdit(2);
   }
 
   isLoading = false;
@@ -17,14 +16,18 @@ class EditModelStore {
 
   vehicleMakes = [];
 
+  onIdAssigned(id) {
+    this.loadVehicleModelToEdit(id);
+  }
+
   async loadVehicleModelToEdit(id) {
     this.setIsLoading(true);
     let model = await VehicleModelsService.getVehicleModel(id);
-    await this.loadVehicleMakes();
+    await this.loadVehicleMakes(model.makeName);
     this.setVehicleModelToEdit(model);
   }
 
-  async loadVehicleMakes() {
+  async loadVehicleMakes(makeName) {
     let vehicleMakes = await VehicleMakesService.getVehicleMakes({
       searchQuery: "",
       pageSize: 50,
@@ -32,6 +35,7 @@ class EditModelStore {
       pageNumber: 1,
     });
     this.setVehicleMakes(vehicleMakes.vehicleMakes);
+    await this.loadVehicleMake(vehicleMakes.vehicleMakes, makeName);
     this.setIsLoading(false);
   }
 
@@ -69,16 +73,15 @@ class EditModelStore {
     this.setIsEdited(true);
   }
 
-  async loadVehicleMakeAndModel(vehicleModel) {
-    if (this.vehicleMakes.length === 0) {
+  async loadVehicleMake(vehicleMakes, makeName) {
+    if (vehicleMakes.length === 0) {
       return;
     }
-    let id = this.vehicleMakes.filter(
-      (make) => make.name === vehicleModel.makeName
-    )[0].id;
+
+    let id = vehicleMakes.filter(make => make.name === makeName)[0].id;
     let vehicleModelToEditMake = await VehicleMakesService.getVehicleMake(id);
+
     this.setVehicleModelToEditMake(vehicleModelToEditMake);
-    this.setVehicleModelToEdit(vehicleModel);
   }
 
   setVehicleModelToEdit(model) {
@@ -90,4 +93,4 @@ class EditModelStore {
   }
 }
 
-export default EditModelStore = new EditModelStore();
+export default EditModelStore;

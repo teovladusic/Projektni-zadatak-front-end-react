@@ -6,7 +6,7 @@ class VehicleModelsService {
   detailsUrl = `${this.mainUrl}/details`;
   editUrl = `${this.mainUrl}/edit`;
 
-  createVehicleModel = async (vehicleModel) => {
+  createVehicleModel = async vehicleModel => {
     const requestOptions = {
       method: "POST",
       headers: {
@@ -23,7 +23,7 @@ class VehicleModelsService {
     await fetch(this.createUrl, requestOptions);
   };
 
-  deleteVehicleModel = async (id) => {
+  deleteVehicleModel = async id => {
     const requestOptions = {
       method: "POST",
       headers: {
@@ -33,10 +33,11 @@ class VehicleModelsService {
     };
 
     let response = await fetch(`${this.deleteUrl}/${id}`, requestOptions);
-    await response.json();
+    let a = await response.json();
+    console.log(a);
   };
 
-  getVehicleModel = async (id) => {
+  getVehicleModel = async id => {
     let response = await fetch(`${this.detailsUrl}/${id}`);
     let json = await response.json();
     return json;
@@ -57,8 +58,7 @@ class VehicleModelsService {
         vehicleMakeId: vehicleMakeId,
       }),
     };
-    var response = await fetch(this.editUrl, requestOptions);
-    console.log(response);
+    await fetch(this.editUrl, requestOptions);
   };
 
   getVehicleModels = async ({

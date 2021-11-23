@@ -4,14 +4,9 @@ import VehicleMakesService from "../../common/VehicleMakesService";
 
 class VehicleModelsIndexStore {
   constructor() {
-    makeAutoObservable(this);
     this.loadVehicleModels();
+    makeAutoObservable(this);
   }
-
-  pagedVehicleModels = { vehicleModels: [] };
-  isLoading = true;
-
-  vehicleMakes = [];
 
   params = {
     searchQuery: "",
@@ -21,6 +16,15 @@ class VehicleModelsIndexStore {
     makeName: "",
   };
 
+  setParams(params) {
+    this.params = params;
+  }
+
+  pagedVehicleModels = { vehicleModels: [] };
+  isLoading = true;
+
+  vehicleMakes = [];
+
   setIsLoading(isLoading) {
     this.isLoading = isLoading;
   }
@@ -29,19 +33,46 @@ class VehicleModelsIndexStore {
     this.vehicleMakes = vehicleMakes;
   }
 
+  setPagedVehicleModels(pagedVehicleModels) {
+    this.pagedVehicleModels = pagedVehicleModels;
+  }
+
   async loadVehicleModels() {
-    console.log("loadVehicleModels");
     this.setIsLoading(true);
-    this.pagedVehicleModels = await VehicleModelsService.getVehicleModels(
-      this.params
-    );
+    let newModels = await VehicleModelsService.getVehicleModels(this.params);
+    this.setPagedVehicleModels(newModels);
+    let newParams = {
+      ...this.params,
+      pageSize: this.pagedVehicleModels.pageSize,
+    };
+    this.setParams(newParams);
     await this.loadVehicleMakes();
     this.setIsLoading(false);
-    console.log("loaded");
+  }
+
+  onPreviousPageClicked() {
+    if (!this.pagedVehicleModels.hasPrevious) return;
+    let prevPage = this.pagedVehicleModels.currentPage - 1;
+    let newParams = { ...this.params, pageNumber: prevPage };
+    this.updateParamsAndLoadVehicleModels(newParams);
+  }
+
+  onNextPageClicked() {
+    if (!this.pagedVehicleModels.hasNext) return;
+    let nextPage = this.pagedVehicleModels.currentPage + 1;
+    let newParams = { ...this.params, pageNumber: nextPage };
+    this.updateParamsAndLoadVehicleModels(newParams);
+  }
+
+  updateParamsAndLoadVehicleModels(newParams) {
+    if (newParams.makeName === "Select Make") {
+      newParams.makeName = "";
+    }
+    this.params = newParams;
+    this.loadVehicleModels(newParams);
   }
 
   async loadVehicleMakes() {
-    console.log("load vehicle makes");
     let vehicleMakes = await VehicleMakesService.getVehicleMakes({
       searchQuery: "",
       pageSize: 50,
@@ -50,32 +81,6 @@ class VehicleModelsIndexStore {
     });
     this.setVehicleMakes(vehicleMakes.vehicleMakes);
   }
-
-  async updateParamsAndLoadVehicleModels(params) {
-    console.log("updateParamsAndLoadVehicleModels");
-    if (params.makeName === "Select Make") {
-      params.makeName = "";
-    }
-    this.params = params;
-    this.setIsLoading(true);
-    await this.loadVehicleModels();
-  }
-
-  onPreviousPageClicked() {
-    console.log("onPreviousPageClicked");
-    if (!this.pagedVehicleModels.hasPrevious) return;
-    let prevPage = this.pagedVehicleModels.currentPage - 1;
-    let newParams = { ...this.params, pageNumber: prevPage };
-    this.updateParamsAndLoadVehicleModels(newParams);
-  }
-
-  onNextPageClicked() {
-    console.log("onNextPageClicked");
-    if (!this.pagedVehicleModels.hasNext) return;
-    let nextPage = this.pagedVehicleModels.currentPage + 1;
-    let newParams = { ...this.params, pageNumber: nextPage };
-    this.updateParamsAndLoadVehicleModels(newParams);
-  }
 }
 
-export default VehicleModelsIndexStore = new VehicleModelsIndexStore();
+export default VehicleModelsIndexStore;

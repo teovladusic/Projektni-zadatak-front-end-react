@@ -1,35 +1,33 @@
 import { observer } from "mobx-react";
 import { useRef } from "react";
 import { OrderByOptions } from "../../common/Utils";
-import VehicleModelsIndexStore from "../../stores/vehicle-models/VehicleModelsIndexStore";
 
-const VehicleModelsFormComponent = observer(() => {
+const VehicleModelsFormComponent = observer(props => {
   const searchQueryRefContainer = useRef(null);
   const orderByRefContainer = useRef(null);
   const pageSizeRefContainer = useRef(null);
   const makeNameRefContainer = useRef(null);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     let newParams = {
       searchQuery: searchQueryRefContainer.current.value,
       orderBy: orderByRefContainer.current.value,
       makeName: makeNameRefContainer.current.value,
       pageSize: pageSizeRefContainer.current.value,
-      pageNumber: VehicleModelsIndexStore.params.pageNumber,
+      pageNumber: props.params.pageNumber,
     };
-
-    VehicleModelsIndexStore.updateParamsAndLoadVehicleModels(newParams);
+    props.onNewParams(newParams);
   };
 
-  if (VehicleModelsIndexStore.isLoading) {
+  if (props.isLoading) {
     return <></>;
   }
   return (
     <>
-      <form className="models-query-form" onSubmit={(e) => handleSubmit(e)}>
+      <form className="models-query-form" onSubmit={e => handleSubmit(e)}>
         <input
-          defaultValue={VehicleModelsIndexStore.params.searchQuery}
+          defaultValue={props.params.searchQuery}
           className="search"
           type="text"
           name="searchQuery"
@@ -39,13 +37,13 @@ const VehicleModelsFormComponent = observer(() => {
 
         <select
           className="select-make"
-          defaultValue={VehicleModelsIndexStore.params.makeName}
+          defaultValue={props.params.makeName}
           id="selectMakeControl"
           name="makeName"
           ref={makeNameRefContainer}
         >
           <option> Select Make</option>
-          {VehicleModelsIndexStore.vehicleMakes.map((vehicleMake) => {
+          {props.vehicleMakes.map(vehicleMake => {
             return (
               <option key={vehicleMake.id} value={vehicleMake.name}>
                 {vehicleMake.name}
@@ -56,7 +54,7 @@ const VehicleModelsFormComponent = observer(() => {
 
         <select
           className="order-by-select"
-          defaultValue={VehicleModelsIndexStore.params.orderBy}
+          defaultValue={props.params.orderBy}
           id="orderByControl"
           name="orderBy"
           ref={orderByRefContainer}
@@ -76,7 +74,7 @@ const VehicleModelsFormComponent = observer(() => {
           <input
             type="number"
             name="pageSize"
-            defaultValue={VehicleModelsIndexStore.params.pageSize}
+            defaultValue={props.params.pageSize}
             ref={pageSizeRefContainer}
           />
         </div>
@@ -88,20 +86,14 @@ const VehicleModelsFormComponent = observer(() => {
 
       <div className="next-previous">
         <button
-          onClick={() => VehicleModelsIndexStore.onPreviousPageClicked()}
-          className={`btn btn-default ${
-            VehicleModelsIndexStore.pagedVehicleModels.hasPrevious
-              ? ""
-              : "disabled"
-          }`}
+          onClick={() => props.onPreviousPageClicked()}
+          className={`btn btn-default ${props.hasPrevious ? "" : "disabled"}`}
         >
           Previous
         </button>
         <button
-          onClick={() => VehicleModelsIndexStore.onNextPageClicked()}
-          className={`btn btn-default ${
-            VehicleModelsIndexStore.pagedVehicleModels.hasNext ? "" : "disabled"
-          }`}
+          onClick={() => props.onNextPageClicked()}
+          className={`btn btn-default ${props.hasNext ? "" : "disabled"}`}
         >
           Next
         </button>

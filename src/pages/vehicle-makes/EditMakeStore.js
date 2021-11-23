@@ -4,18 +4,23 @@ import VehicleMakesService from "../../common/VehicleMakesService";
 class EditMakeStore {
   constructor() {
     makeAutoObservable(this);
-    this.loadVehicleMakeToEdit();
   }
 
-  async loadVehicleMakeToEdit() {
-    let make = await VehicleMakesService.getVehicleMake(2);
-    this.setVehicleMakeToEdit(make);
-  }
-
-  isLoading = true;
+  isLoading = false;
 
   setIsLoading(isLoading) {
     this.isLoading = isLoading;
+  }
+
+  onIdAssigned(id) {
+    this.loadVehicleMakeToEdit(id);
+  }
+
+  async loadVehicleMakeToEdit(id) {
+    this.setIsLoading(true);
+    let make = await VehicleMakesService.getVehicleMake(id);
+    this.setVehicleMakeToEdit(make);
+    this.setIsLoading(false);
   }
 
   editMakeError = { name: false, abrv: false };
@@ -27,12 +32,10 @@ class EditMakeStore {
   }
 
   async editVehicleMake(vehicleMake) {
-    this.setIsLoading(true);
     if (vehicleMake.name) {
       this.editMakeError = { ...this.editMakeError, name: false };
     } else {
       this.editMakeError = { ...this.editMakeError, name: true };
-      this.setIsLoading(false);
       return;
     }
 
@@ -40,7 +43,6 @@ class EditMakeStore {
       this.editMakeError = { ...this.editMakeError, abrv: false };
     } else {
       this.editMakeError = { ...this.editMakeError, abrv: true };
-      this.setIsLoading(false);
       return;
     }
 
@@ -50,9 +52,7 @@ class EditMakeStore {
 
   setVehicleMakeToEdit(vehicleMake) {
     this.vehicleMakeToEdit = vehicleMake;
-    console.log(this.vehicleMakeToEdit);
-    this.setIsLoading(false);
   }
 }
 
-export default EditMakeStore = new EditMakeStore();
+export default EditMakeStore;

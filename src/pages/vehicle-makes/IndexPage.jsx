@@ -1,12 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./IndexPage.css";
-import VehicleMakesListComponent from "./VehicleMakesListComponent";
-import VehicleMakesFormComponent from "./VehicleMakesFormComponent";
 import { inject, observer } from "mobx-react";
+import VehicleMakesIndexStore from "./VehicleMakesIndexStore";
+import VehicleMakesFormComponent from "./VehicleMakesFormComponent";
+import VehicleMakesListComponent from "./VehicleMakesListComponent";
 
-const IndexPage = inject("vehicleMakesIndexStore")(
-  observer((props) => {
+const IndexPage = inject(provider => ({
+  vehicleMakesIndexStore: new VehicleMakesIndexStore(),
+}))(
+  observer(props => {
+    const onNewParams = newParams => {
+      props.vehicleMakesIndexStore.updateParamsAndLoadVehicleMakes(newParams);
+    };
+
     return (
       <div className="container">
         <h1>Vehicle Makes</h1>
@@ -14,8 +21,25 @@ const IndexPage = inject("vehicleMakesIndexStore")(
           Create New Make
         </Link>
         <hr />
-        <VehicleMakesFormComponent store={props.vehicleMakesIndexStore} />
-        <VehicleMakesListComponent store={props.vehicleMakesIndexStore} />
+        <VehicleMakesFormComponent
+          props={{
+            params: props.vehicleMakesIndexStore.params,
+            hasNext: props.vehicleMakesIndexStore.pagedVehicleMakes.hasNext,
+            hasPrevious:
+              props.vehicleMakesIndexStore.pagedVehicleMakes.hasPrevious,
+            currentPage:
+              props.vehicleMakesIndexStore.pagedVehicleMakes.currentPage,
+            isLoading: props.vehicleMakesIndexStore.isLoading,
+            onNewParams: onNewParams,
+          }}
+        />
+        <VehicleMakesListComponent
+          props={{
+            isLoading: props.vehicleMakesIndexStore.isLoading,
+            vehicleMakes:
+              props.vehicleMakesIndexStore.pagedVehicleMakes.vehicleMakes,
+          }}
+        />
       </div>
     );
   })

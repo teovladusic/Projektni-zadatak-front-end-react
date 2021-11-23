@@ -1,44 +1,44 @@
 import { OrderByOptions } from "../../common/Utils";
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import { useRef } from "react";
 
-const VehicleMakesFormComponent = observer(({ store }) => {
+const VehicleMakesFormComponent = observer(({ props }) => {
   const searchQueryRefContainer = useRef(null);
   const orderByRefContainer = useRef(null);
   const pageSizeRefContainer = useRef(null);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     let newParams = {
-      pageNumber: store.params.pageNumber,
+      pageNumber: props.params.pageNumber,
       searchQuery: searchQueryRefContainer.current.value,
       orderBy: orderByRefContainer.current.value,
       pageSize: pageSizeRefContainer.current.value,
     };
-    store.updateParamsAndLoadVehicleMakes(newParams);
+    props.onNewParams(newParams);
   };
 
   const onNextPageClick = async () => {
-    if (!store.pagedVehicleMakes.hasNext) return;
-    let nextPage = store.pagedVehicleMakes.currentPage + 1;
+    if (!props.hasNext) return;
+    let nextPage = props.currentPage + 1;
     let newParams = {
-      ...store.params,
+      ...props.params,
       pageNumber: nextPage,
     };
-    store.updateParamsAndLoadVehicleMakes(newParams);
+    props.onNewParams(newParams);
   };
 
   const onPrevPageClick = async () => {
-    if (!store.pagedVehicleMakes.hasPrevious) return;
-    let prevPage = store.pagedVehicleMakes.currentPage - 1;
+    if (!props.hasPrevious) return;
+    let prevPage = props.currentPage - 1;
     let newParams = {
-      ...store.params,
+      ...props.params,
       pageNumber: prevPage,
     };
-    store.updateParamsAndLoadVehicleMakes(newParams);
+    props.onNewParams(newParams);
   };
 
-  if (store.isLoading) {
+  if (props.isLoading) {
     return <></>;
   }
 
@@ -51,7 +51,7 @@ const VehicleMakesFormComponent = observer(({ store }) => {
           name="searchQuery"
           placeholder="Search.."
           ref={searchQueryRefContainer}
-          defaultValue={store.params.searchQuery}
+          defaultValue={props.params.searchQuery}
         />
 
         <select
@@ -59,7 +59,7 @@ const VehicleMakesFormComponent = observer(({ store }) => {
           id="orderByControl"
           name="orderBy"
           ref={orderByRefContainer}
-          defaultValue={store.params.orderBy}
+          defaultValue={props.params.orderBy}
         >
           <option>Order By</option>
           {OrderByOptions.map((option, index) => {
@@ -73,7 +73,7 @@ const VehicleMakesFormComponent = observer(({ store }) => {
             type="number"
             name="pageSize"
             ref={pageSizeRefContainer}
-            defaultValue={store.params.pageSize}
+            defaultValue={props.params.pageSize}
           />
         </div>
 
@@ -84,17 +84,13 @@ const VehicleMakesFormComponent = observer(({ store }) => {
 
       <div className="next-previous">
         <button
-          className={`btn btn-default ${
-            store.pagedVehicleMakes.hasPrevious ? "" : "disabled"
-          }`}
+          className={`btn btn-default ${props.hasPrevious ? "" : "disabled"}`}
           onClick={onPrevPageClick}
         >
           Previous
         </button>
         <button
-          className={`btn btn-default ${
-            store.pagedVehicleMakes.hasNext ? "" : "disabled"
-          }`}
+          className={`btn btn-default ${props.hasNext ? "" : "disabled"}`}
           onClick={onNextPageClick}
         >
           Next

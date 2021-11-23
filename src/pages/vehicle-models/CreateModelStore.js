@@ -4,8 +4,8 @@ import VehicleMakesService from "../../common/VehicleMakesService";
 
 class CreateModelStore {
   constructor() {
-    makeAutoObservable(this);
     this.loadVehicleMakes();
+    makeAutoObservable(this);
   }
 
   isLoading = false;
@@ -51,12 +51,13 @@ class CreateModelStore {
     } else {
       this.createModelError = { ...this.createModelError, abrv: true };
       this.setIsLoading(false);
+      debugger;
       return;
     }
 
     await VehicleModelsService.createVehicleModel(vehicleModel);
-    this.isCreated = true;
+    this.setIsCreated(true);
   }
 }
 
-export default CreateModelStore = new CreateModelStore();
+export default CreateModelStore;

@@ -15,6 +15,10 @@ class CreateMakeStore {
   createMakeError = { name: false, abrv: false };
   isCreated = false;
 
+  setIsCreated(isCreated) {
+    this.isCreated = isCreated;
+  }
+
   async createVehicleMake(vehicleMake) {
     this.setIsLoading(true);
     if (vehicleMake.name) {
@@ -34,8 +38,8 @@ class CreateMakeStore {
     }
 
     await VehicleMakesService.createVehicleMake(vehicleMake);
-    this.isCreated = true;
+    this.setIsCreated(true);
   }
 }
 
-export default CreateMakeStore = new CreateMakeStore();
+export default CreateMakeStore;

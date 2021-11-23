@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { observer } from "mobx-react";
 
-const VehicleMakesListComponent = observer(({ store }) => {
-  if (store.isLoading) {
+const VehicleMakesListComponent = observer(({ props }) => {
+  if (props.isLoading) {
     return (
       <div>
         <h2>Loading...</h2>
@@ -19,7 +19,7 @@ const VehicleMakesListComponent = observer(({ store }) => {
         </tr>
       </thead>
       <tbody>
-        {store.pagedVehicleMakes.vehicleMakes.map((vehicleMake) => {
+        {props.vehicleMakes.map(vehicleMake => {
           return (
             <tr key={vehicleMake.id}>
               <td>{vehicleMake.name}</td>

@@ -15,18 +15,6 @@ import ModelDetails from "../pages/vehicle-models/DetailsPage.jsx";
 import DeleteModel from "../pages/vehicle-models/DeletePage.jsx";
 import CreateModel from "../pages/vehicle-models/CreatePage.jsx";
 
-import EditMakeStore from "../stores/vehicle-makes/EditMakeStore.js";
-import MakeDetailsStore from "../stores/vehicle-makes/MakeDetailsStore.js";
-import DeleteMakeStore from "../stores/vehicle-makes/DeleteMakeStore.js";
-import CreateMakeStore from "../stores/vehicle-makes/CreateMakeStore";
-import VehicleMakesIndexStore from "../stores/vehicle-makes/VehicleMakesIndexStore.js";
-
-import CreateModelStore from "../stores/vehicle-models/CreateModelStore.js";
-import DeleteModelStore from "../stores/vehicle-models/DeleteModelStore.js";
-import ModelDetailsStore from "../stores/vehicle-models/ModelDetailsStore.js";
-import EditModelStore from "../stores/vehicle-models/EditModelStore.js";
-import VehicleModelsIndexStore from "../stores/vehicle-models/VehicleModelsIndexStore.js";
-
 import { observer } from "mobx-react";
 import { Router, RouterStore } from "react-router-mobx";
 

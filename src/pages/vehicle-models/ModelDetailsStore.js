@@ -4,7 +4,10 @@ import VehicleModelsService from "../../common/VehicleModelsService";
 class ModelDetailsStore {
   constructor() {
     makeAutoObservable(this);
-    this.loadVehicleModelToSeeDetails(2);
+  }
+
+  onIdAssigned(id) {
+    this.loadVehicleModelToSeeDetails(id);
   }
 
   async loadVehicleModelToSeeDetails(id) {
@@ -26,4 +29,4 @@ class ModelDetailsStore {
   }
 }
 
-export default ModelDetailsStore = new ModelDetailsStore();
+export default ModelDetailsStore;
